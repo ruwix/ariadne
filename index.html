@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Robo Odyssey</title>
+  <link href="stylesheet.css" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <!-- <script src="blob.js"></script> -->
+  <!-- <script src="filesaver.js"></script> -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet">
+  <script type="text/javascript" src="spline.js"></script>
+  <script type="text/javascript" src="script.js"></script>
+
+</head>
+
+<body onload="init()">
+  <input id="title" placeholder="Title">
+  <div style="text-align:center;">
+    <svg id="field" height="324" width="652">
+      <path id="path" stroke="black" fill="transparent" />
+
+    </svg>
+  </div>
+  <div class="buttonContainer">
+    <button onclick="addPoint()">Add Point</button>
+    <button onclick="exportData()">Download</button>
+    <button onclick="importData()">Import</button>
+    <!-- <button onclick="flipField()">Flip Field</button> -->
+    <!-- <span style="font-size: 15px; float: right;">Is reversed: <input type="checkbox" id="isReversed"></span> -->
+  </div>
+  <table>
+    <thead>
+      <th>X</th>
+      <th>Y</th>
+      <th>Heading</th>
+      <th>Speed</th>
+      <th>Comments</th>
+      <th>Delete</th>
+    </thead>
+    <tbody>
+
+    </tbody>
+  </table>
+
+  <input type="file" id="upl" style="display:none;">
+</body>
+
+</html>
