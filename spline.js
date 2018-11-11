@@ -24,29 +24,5 @@ function interpolatePoint(t, pose0, pose1) {
     x = ax * t * t * t + bx * t * t + cx * t + dx;
     y = ay * t * t * t + by * t * t + cy * t + dy;
     var ret = new Vector(x, y);
-    console.log(ret.x);
     return ret;
-};
-// function interpolatePoint(x, pose0, pose1) {
-//     var scale = 1.2 * Math.sqrt(Math.pow(pose1.x - pose0.x, 2) + Math.pow(pose1.y - pose0.y, 2));
-//     var t = affineTransform(x, pose0.x, pose1.x);
-//     var ret = h00(t) * pose0.y + h10(t) * -Math.tan(pose0.heading * (Math.PI / 180)) * scale + h01(t) * pose1.y + h11(t) * -Math.tan(pose1.heading * (Math.PI / 180)) * scale;
-//     return ret;
-// }
-
-function affineTransform(x, x_init, x_final) {
-    return (x - x_init) / (x_final - x_init);
-}
-
-function h00(x) {
-    return 2 * x * x * x - 3 * x * x + 1;
-}
-function h10(x) {
-    return x * x * x - 2 * x * x + x;
-}
-function h01(x) {
-    return -2 * x * x * x + 3 * x * x;
-}
-function h11(x) {
-    return x * x * x - x * x;
 }
