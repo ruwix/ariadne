@@ -48,8 +48,12 @@ function drawRobot(index) {
     newGroup.appendTo(svg);
 }
 function drawRobots() {
-    drawRobot(0);
-    drawRobot(waypoints.length - 1);
+    if (waypoints.length > 0) {
+        drawRobot(0);
+    }
+    if (waypoints.length > 1) {
+        drawRobot(waypoints.length - 1);
+    }
 }
 function update() {
     waypoints = [];
@@ -60,12 +64,17 @@ function update() {
         var y = parseInt($($($(this).children()).children()[1]).val());
         var heading = parseInt($($($(this).children()).children()[2]).val());
         var speed = parseInt($($($(this).children()).children()[3]).val());
-        if (isNaN(heading) || isNaN(speed)) {
+        let enabled = ($($($(this).children()).children()[5]).prop('checked'));
+        if (isNaN(heading)) {
             heading = 0;
+        }
+        if (isNaN(speed)) {
             speed = 60;
         }
         var comment = ($($($(this).children()).children()[4]).val())
-        waypoints.push(new Waypoint(x, y, heading, speed, comment));
+        if (enabled) {
+            waypoints.push(new Waypoint(x, y, heading, speed, comment));
+        }
     });
     drawPoses();
     drawRobots();
@@ -150,7 +159,7 @@ function importData() {
             var title = fr.fileName.split('.').slice(0, -1).join('.')
             $("#title").val(title);
             parse.forEach((waypoint) => {
-                appendTable(waypoint.pose.x, waypoint.pose.y, waypoint.pose.heading, waypoint.speed, waypoint.comment);
+                appendTable(waypoint.pose.x, waypoint.pose.y, waypoint.pose.heading, waypoint.speed, 0, waypoint.comment);
             });
             update();
             bindInputs();
@@ -159,7 +168,7 @@ function importData() {
     });
 }
 function bindInputs() {
-    $('input').bind("change paste keyup", function () {
+    $('input').bind("propertychange change click keyup input paste", function () {
         clearTimeout(wto);
         wto = setTimeout(function () {
             update();
@@ -167,13 +176,14 @@ function bindInputs() {
     });
 }
 
-function appendTable(x = 50, y = 50, heading = 0, speed = 60, comment = "") {
+function appendTable(x = 50, y = 50, heading = 0, speed = 60, enabled = 1, comment = "") {
     $("tbody").append("<tr>" +
         "<td><input type='number' value='" + (x) + "'></td>" +
         "<td><input type='number' value='" + (y) + "'></td>" +
         "<td><input type='number' value='" + heading + "'></td>" +
         "<td><input type='number' value='" + speed + "'></td>" +
         "<td class='comments'><input placeholder='Comments' value='" + comment + "'></td>" +
+        "<td><input type='checkbox' checked></td>" +
         "<td><button onclick='$(this).parent().parent().remove();update()'>Delete</button></td></tr>"
     );
 }

@@ -1,8 +1,8 @@
 * {
     font-family: 'Roboto', sans-serif;
-  }
+}
 
-  #title {
+#title {
     font-size: 28px;
     margin: 20px auto 20px auto;
     padding: 4px;
@@ -11,49 +11,49 @@
     border-bottom: #aaa solid 1px;
     text-align: center;
     width: 500px;
-  }
-  
-  #title,
-  #title:focus {
+}
+
+#title,
+#title:focus {
     outline: none;
-  }
-  
-  canvas {
+}
+
+canvas {
     margin: 0 auto;
     display: block;
-  }
-  
-  table {
+}
+
+table {
     width: 828px;
     margin: 5px auto;
     border-collapse: collapse;
     box-shadow: 0px 3px 5px rgba(128, 128, 128, 0.4);
-  }
-  
-  thead {
+}
+
+thead {
     background-color: #82AAFF;
     color: #fff;
-  }
-  
-  thead>tr>th {
+}
+
+thead>tr>th {
     padding: 8px 0;
-  }
-  
-  tbody:before,
-  tbody:after {
+}
+
+tbody:before,
+tbody:after {
     content: '';
     display: block;
     height: 5px;
-  }
-  
-  td {
+}
+
+td {
     text-align: center;
     padding: 3px 0;
     font-size: 14px;
-  }
-  
-  td>input,
-  td>input:focus {
+}
+
+td>input,
+td>input:focus {
     font-size: 14px;
     padding: 2px;
     border: none;
@@ -62,19 +62,19 @@
     text-align: center;
     width: 50px;
     outline: none;
-  }
-  
-  .comments>input,
-  .comments>input:focus {
+}
+
+.comments>input,
+.comments>input:focus {
     width: 200px;
-  }
-  
-  .buttonContainer {
+}
+
+.buttonContainer {
     width: 828px;
     margin: 10px auto;
-  }
-  
-  .modal {
+}
+
+.modal {
     position: fixed;
     width: 1000px;
     min-height: 100px;
@@ -85,9 +85,9 @@
     opacity: 1;
     background-color: #fff;
     transition: opacity 0.5s;
-  }
-  
-  .shade {
+}
+
+.shade {
     display: block;
     width: 200vw;
     height: 200vh;
@@ -97,46 +97,46 @@
     top: -50vh;
     opacity: 1;
     transition: opacity 0.5s;
-  }
-  
-  .shade.hide,
-  .modal.hide {
+}
+
+.shade.hide,
+.modal.hide {
     opacity: 0;
-  }
-  
-  .shade.behind,
-  .modal.behind {
+}
+
+.shade.behind,
+.modal.behind {
     z-index: -5;
-  }
-  
-  .modal>div {
+}
+
+.modal>div {
     background-color: #34495e;
     color: #fff;
     text-align: center;
     padding: 10px;
     z-index: 10;
-  }
-  
-  .close {
+}
+
+.close {
     position: absolute;
     display: inline-block;
     right: 15px;
     cursor: pointer;
     color: #ccc;
     transition: color 0.15s;
-  }
-  
-  .close:hover {
+}
+
+.close:hover {
     color: #fff;
-  }
-  
-  pre {
+}
+
+pre {
     padding: 0 20px;
     font-size: 14px;
     font-family: 'Source Code Pro', monospace !important;
-  }
-  
-  button {
+}
+
+button {
     background-color: #89DDFF;
     border: none;
     padding: 7px 12px;
@@ -145,26 +145,31 @@
     cursor: pointer;
     font-size: 12px;
     transition: background-color 0.25s
-  }
-  
-  button:hover {
+}
+
+button:hover {
     background-color: #82AAFF;
-  }
-  
-  button:focus {
+}
+
+button:focus {
     outline: none;
-  }
-  
-  td>button {
+}
+
+td>button {
     background-color: #FF5370;
-  }
-  
-  td>button:hover {
+}
+
+td>button:hover {
     background-color: #F07178;
-  }
-  
-  #field {
+}
+
+#field {
     background-size: contain;
     background-image: url('field.png');
     background-repeat: no-repeat;
-  }
+}
+
+input[type=checkbox] {
+    transform: scale(1.25);
+    padding: 10px;
+}
