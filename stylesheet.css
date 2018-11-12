@@ -31,7 +31,7 @@
   }
   
   thead {
-    background-color: #0070FF;
+    background-color: #82AAFF;
     color: #fff;
   }
   
@@ -137,7 +137,7 @@
   }
   
   button {
-    background-color: #42BBFF;
+    background-color: #89DDFF;
     border: none;
     padding: 7px 12px;
     border-radius: 4px;
@@ -148,7 +148,7 @@
   }
   
   button:hover {
-    background-color: #42AAFF;
+    background-color: #82AAFF;
   }
   
   button:focus {
@@ -156,16 +156,15 @@
   }
   
   td>button {
-    background-color: #FF1900;
+    background-color: #FF5370;
   }
   
   td>button:hover {
-    background-color: #EE1900;
+    background-color: #F07178;
   }
   
-  /* circle{
-    fill: #FF0000;
-  } */
   #field {
+    background-size: contain;
     background-image: url('field.png');
-}
+    background-repeat: no-repeat;
+  }
