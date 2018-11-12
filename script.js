@@ -1,5 +1,9 @@
 var wto;
 var waypoints = []
+var ROBOT_WIDTH = 35.45;
+var ROBOT_HEIGHT = 33.325;
+var FIELD_WIDTH_INCHES = 652;
+var FIELD_HEIGHT_INCHES = 324;
 
 var Pose = function (x, y, heading) {
     this.x = x || 0;
@@ -17,10 +21,40 @@ function init() {
     bindInputs();
     addPoint();
     addPoint();
+    drawRobots();
 }
 
+function drawRobot(index) {
+    var svg = $('#field');
+    var x = waypoints[index].pose.x;
+    var y = waypoints[index].pose.y;
+
+    var newGroup = $(document.createElementNS('http://www.w3.org/2000/svg', 'g'));
+    $(newGroup).attr({
+        transform: "rotate(" + -waypoints[index].pose.heading + " " + x + " " + y + ")",
+    });
+    var newRect = $(document.createElementNS('http://www.w3.org/2000/svg', 'rect'));
+    $(newRect).attr({
+        width: ROBOT_WIDTH,
+        height: ROBOT_HEIGHT,
+        x: x - ROBOT_WIDTH / 2,
+        y: y - ROBOT_HEIGHT / 2,
+        "stroke-width": 3,
+        // stroke: "#00AAFF",
+        stroke: "#F78C6C",
+        fill: "transparent",
+    });
+    newRect.appendTo(newGroup);
+    newGroup.appendTo(svg);
+}
+function drawRobots() {
+    drawRobot(0);
+    drawRobot(waypoints.length - 1);
+}
 function update() {
     waypoints = [];
+    var svg = $('#field');
+    svg.empty();
     $('tbody').children('tr').each(function () {
         var x = parseInt($($($(this).children()).children()[0]).val());
         var y = parseInt($($($(this).children()).children()[1]).val());
@@ -34,26 +68,28 @@ function update() {
         waypoints.push(new Waypoint(x, y, heading, speed, comment));
     });
     drawPoses();
+    drawRobots();
+
 }
 
 function drawPoses() {
     var svg = $('#field');
-    svg.empty();
+    // svg.empty();
     for (var i = 0; i < waypoints.length; i++) {
         if (waypoints.length > 1 && i != waypoints.length - 1) {
             path = "M " + waypoints[i].pose.x + " " + waypoints[i].pose.y
-            for (var t = 0; t < 1; t += 0.05) {
+            for (var t = 0; t < 1; t += 0.01) {
                 var point = interpolatePoint(t, waypoints[i].pose, waypoints[i + 1].pose);
-                path += " L " + Math.round(point.x) + " " + Math.round(point.y) + " ";
+                path += " L " + point.x + " " + point.y + " ";
             }
             path += " L " + waypoints[i + 1].pose.x + " " + waypoints[i + 1].pose.y;
 
             var newPath = $(document.createElementNS('http://www.w3.org/2000/svg', 'path'));
             $(newPath).attr({
                 d: path,
-                stroke: "#2CFF2C",
+                stroke: "#C3E88D",
                 fill: "transparent",
-                "stroke-width": "3",
+                "stroke-width": 3,
             });
             newPath.appendTo(svg);
         }
@@ -63,7 +99,7 @@ function drawPoses() {
             cx: Math.round(waypoints[i].pose.x),
             cy: Math.round(waypoints[i].pose.y),
             r: "5",
-            fill: "#FF3355",
+            fill: "#FF5370",
         });
         newCircle.appendTo(svg);
     }
