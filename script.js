@@ -170,7 +170,7 @@ function importData() {
             var title = fr.fileName.split('.').slice(0, -1).join('.')
             $("#title").val(title);
             parse.forEach((waypoint) => {
-                appendTable(waypoint.pose.x, waypoint.pose.y, waypoint.pose.heading, waypoint.speed, 0, waypoint.comment);
+                appendTable(waypoint.pose.x, waypoint.pose.y, waypoint.pose.heading, waypoint.speed, waypoint.comment);
             });
             update();
             bindInputs();
@@ -187,7 +187,7 @@ function bindInputs() {
     });
 }
 
-function appendTable(x = 50, y = 50, heading = 0, speed = 60, enabled = 1, comment = "") {
+function appendTable(x = 50, y = 50, heading = 0, speed = 60, comment = "") {
     $("tbody").append("<tr>" +
         "<td><input type='number' value='" + (x) + "'></td>" +
         "<td><input type='number' value='" + (y) + "'></td>" +
