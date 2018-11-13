@@ -40,11 +40,22 @@ function drawRobot(index) {
         x: x - ROBOT_WIDTH / 2,
         y: y - ROBOT_HEIGHT / 2,
         "stroke-width": 3,
-        // stroke: "#00AAFF",
         stroke: "#F78C6C",
         fill: "transparent",
     });
+    var newLine = $(document.createElementNS('http://www.w3.org/2000/svg', 'line'));
+    $(newLine).attr({
+        x1: x ,
+        y1: y ,
+        x2: x  + ROBOT_WIDTH/2-1,
+        y2: y ,
+        "stroke-width": 3,
+        stroke: "#FF5370",
+        fill: "transparent",
+    });
     newRect.appendTo(newGroup);
+    newLine.appendTo(newGroup);
+
     newGroup.appendTo(svg);
 }
 function drawRobots() {
@@ -120,9 +131,9 @@ function addPoint() {
         prev = waypoints[waypoints.length - 1].pose;
     }
     else {
-        prev = new Pose(50, 50, 0);
+        prev = new Pose(36, 36, 0);
     }
-    appendTable(prev.x + 20, prev.y + 20);
+    appendTable(prev.x + 24, prev.y + 24);
     update();
     bindInputs();
 }
