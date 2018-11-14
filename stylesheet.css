@@ -165,11 +165,29 @@ td>button:hover {
 
 #field {
     background-size: contain;
-    background-image: url('field.png');
+    background-image: url('images/field.png');
     background-repeat: no-repeat;
 }
 
 input[type=checkbox] {
     transform: scale(1.25);
     padding: 10px;
+}
+
+body>footer {
+    font-size: 70%;
+    padding: 3em 0 1em 0em;
+    text-align: center;
+}
+
+body>footer>address {
+    margin-bottom: 0.5em;
+}
+
+body>footer .social {
+    margin-top: 2em;
+}
+
+body>footer img {
+    width: 4em;
 }
