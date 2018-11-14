@@ -20,7 +20,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         file = open(filename, "rb")
         self.send_response(200)
-        self.send_header("Content-type", mimetypes.guess_type(filename)[0])
+        self.send_header("Content-type", mimetypes.guess_type(filename)[0]+"; charset=utf-8")
         self.end_headers()
         copyfileobj(file, self.wfile)
         file.close()
