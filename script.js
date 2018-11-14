@@ -146,13 +146,21 @@ function download(content, fileName, contentType) {
     a.click();
 }
 function exportData() {
+    var title = getTitle();
+    if(!title){
+        return;
+    }
+    var jsonPoses = JSON.stringify(waypoints, null, 1);
+    download(jsonPoses, title + ".json", 'text/plain');
+}
+
+function getTitle() {
     var title = $('#title').val();
     if (!title) {
         window.alert("Please set the title");
         return;
     }
-    var jsonPoses = JSON.stringify(waypoints, null, 1);
-    download(jsonPoses, title + ".json", 'text/plain');
+    return title;
 }
 
 function importData() {
@@ -198,42 +206,47 @@ function appendTable(x = 50, y = 50, heading = 0, speed = 60, comment = "") {
         "<td><button onclick='$(this).parent().parent().remove();update()'>Delete</button></td></tr>"
     );
 }
-function encode(input) {
-    var keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-    var output = "";
-    var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
-    var i = 0;
 
-    while (i < input.length) {
-        chr1 = input[i++];
-        chr2 = i < input.length ? input[i++] : Number.NaN; // Not sure if the index 
-        chr3 = i < input.length ? input[i++] : Number.NaN; // checks are needed here
-
-        enc1 = chr1 >> 2;
-        enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
-        enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
-        enc4 = chr3 & 63;
-
-        if (isNaN(chr2)) {
-            enc3 = enc4 = 64;
-        } else if (isNaN(chr3)) {
-            enc4 = 64;
-        }
-        output += keyStr.charAt(enc1) + keyStr.charAt(enc2) +
-            keyStr.charAt(enc3) + keyStr.charAt(enc4);
+function forceDownload(url, fileName) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    xhr.responseType = "blob";
+    xhr.onload = function () {
+        var urlCreator = window.URL || window.webkitURL;
+        var imageUrl = urlCreator.createObjectURL(this.response);
+        var tag = document.createElement('a');
+        tag.href = imageUrl;
+        tag.download = fileName;
+        document.body.appendChild(tag);
+        tag.click();
+        document.body.removeChild(tag);
     }
-    return output;
+    xhr.send();
 }
+
 function downloadImage() {
     var svg = $("#field");
+    var title = getTitle();
+    if (!title) {
+        return;
+    }
     $.ajax({
         type: 'POST',
         url: '/downloadImage',
-        data: svg[0].outerHTML,
-        contentType: 'image/svg+xml',
-        // dataType: 'image/png',
-        success: function (msg, status, jqXHR) {
-            console.log("hello");
+        data: JSON.stringify({
+            svgData: svg[0].outerHTML,
+            title: title,
+        }),
+        contentType: 'application/json',
+        dataType: 'text',
+        success: function (msg) {
+            var byteCharacters = atob(msg);
+            var byteNumbers = new Array(byteCharacters.length);
+            for (var i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            var byteArray = new Uint8Array(byteNumbers);
+            download(byteArray, title + ".png", "image/png");
         }
     });
 }

@@ -1,18 +1,15 @@
 #!/usr/bin/env python3
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import mimetypes
-import os
-import simplejson
-from cairosvg import svg2png
-import PIL
-import sys
-import io
 import json
-import shutil
+from cairosvg import svg2png
+from PIL import Image
+import os
+from io import BytesIO
+from shutil import copyfileobj
+from base64 import b64encode
 
 class RequestHandler(BaseHTTPRequestHandler):
-    # def _set_response(self):
-    #     pass
     def do_GET(self):
         if self.path.endswith('favicon.ico'):
             return
@@ -25,23 +22,31 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-type", mimetypes.guess_type(filename)[0])
         self.end_headers()
-        shutil.copyfileobj(file,self.wfile)
+        copyfileobj(file, self.wfile)
         file.close()
 
     def do_POST(self):
         if self.path == "/downloadImage":
             data_string = self.rfile.read(int(self.headers['Content-Length']))
-            data = data_string.decode("utf-8")
+            data = json.loads(data_string)
 
-            svg_path = PIL.Image.open(io.BytesIO(svg2png(bytestring=data)))
-            field = PIL.Image.open("field.png")
+            svg_path = Image.open(BytesIO(
+                svg2png(bytestring=data['svgData'])))
+            field = Image.open("field.png")
             svg_path = svg_path.resize(
-                (field.size[0], field.size[1]), PIL.Image.ANTIALIAS)
+                (field.size[0], field.size[1]), Image.ANTIALIAS)
 
+            bytes_buffer = BytesIO()
             field.paste(svg_path, (0, 0), svg_path)
-            field.save("out.png")
-            self.send_response(200)
+            field.save(bytes_buffer, "PNG")
+            bytes_buffer.seek(0)
 
+            self.send_response(200)
+            self.send_header("Content-Type", "text")
+            self.end_headers()
+
+            image_base64 = b64encode(bytes_buffer.read())
+            self.wfile.write(image_base64)
 
 def main():
 
@@ -52,7 +57,6 @@ def main():
     except KeyboardInterrupt:
         pass
     httpd.server_close()
-
 
 if __name__ == '__main__':
     main()
