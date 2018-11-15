@@ -32,7 +32,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
             svg_path = Image.open(BytesIO(
                 svg2png(bytestring=data['svgData'])))
-            field = Image.open("field.png")
+            field = Image.open("images/field.png")
             svg_path = svg_path.resize(
                 (field.size[0], field.size[1]), Image.ANTIALIAS)
 
