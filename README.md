@@ -1,5 +1,5 @@
 # robot-odyssey
-A robot path planner using [cubic hermite splines](https://en.wikipedia.org/wiki/Cubic_Hermite_spline)
+A robot path planner using [cubic Hermite splines](https://en.wikipedia.org/wiki/Cubic_Hermite_spline)
 
 # Install requirements
 1. Run `[pip executable] install pillow`
