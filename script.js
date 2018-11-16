@@ -19,9 +19,9 @@ var Waypoint = function (x, y, heading, speed, comment) {
 
 function init() {
     bindInputs();
-    addPoint();
-    addPoint();
     drawRobots();
+    addPoint();
+    addPoint();
 }
 
 function drawRobot(index) {
@@ -40,8 +40,7 @@ function drawRobot(index) {
         x: x - ROBOT_WIDTH / 2,
         y: y - ROBOT_HEIGHT / 2,
         "stroke-width": 3,
-        stroke: "#F78C6C",
-        fill: "transparent",
+        class: "robot",
     });
     var newLine = $(document.createElementNS('http://www.w3.org/2000/svg', 'line'));
     $(newLine).attr({
@@ -87,14 +86,13 @@ function update() {
             waypoints.push(new Waypoint(x, y, heading, speed, comment));
         }
     });
-    drawPoses();
     drawRobots();
-
+    drawPoses();
+    makePointDraggable($(".draggable"));
 }
 
 function drawPoses() {
     var svg = $('#field');
-    // svg.empty();
     for (var i = 0; i < waypoints.length; i++) {
         if (waypoints.length > 1 && i != waypoints.length - 1) {
             path = "M " + waypoints[i].pose.x + " " + waypoints[i].pose.y
@@ -107,8 +105,7 @@ function drawPoses() {
             var newPath = $(document.createElementNS('http://www.w3.org/2000/svg', 'path'));
             $(newPath).attr({
                 d: path,
-                stroke: "#C3E88D",
-                fill: "transparent",
+                class: "path",
                 "stroke-width": 3,
             });
             newPath.appendTo(svg);
@@ -116,10 +113,10 @@ function drawPoses() {
         var newCircle = $(document.createElementNS('http://www.w3.org/2000/svg', 'circle'));
 
         $(newCircle).attr({
-            cx: Math.round(waypoints[i].pose.x),
-            cy: Math.round(waypoints[i].pose.y),
-            r: "5",
-            fill: "#FF5370",
+            cx: waypoints[i].pose.x,
+            cy: waypoints[i].pose.y,
+            class: "draggable waypoint",
+            r: 5,
         });
         newCircle.appendTo(svg);
     }
@@ -147,7 +144,7 @@ function download(content, fileName, contentType) {
 }
 function exportData() {
     var title = getTitle();
-    if(!title){
+    if (!title) {
         return;
     }
     var jsonPoses = JSON.stringify(waypoints, null, 1);
@@ -187,7 +184,7 @@ function importData() {
     });
 }
 function bindInputs() {
-    $('input').bind("propertychange change click keyup input paste", function () {
+    $('input').on("propertychange change click keyup input paste", function () {
         clearTimeout(wto);
         wto = setTimeout(function () {
             update();
@@ -249,4 +246,24 @@ function downloadImage() {
             download(byteArray, title + ".png", "image/png");
         }
     });
+}
+
+function makePointDraggable(point) {
+    point.draggable()
+        .on('mouseup', function (event) {
+            update();
+        })
+        .on('drag', function (event) {
+            var circles = Array.prototype.slice.call(document.getElementsByTagName('circle'));
+            var index = circles.indexOf(event.target);
+            var svg = $("#field");
+            var x = event.clientX - svg[0].getBoundingClientRect().left;
+            var y = event.clientY - svg[0].getBoundingClientRect().top;
+            $(event.target).attr({
+                cx: x,
+                cy: y,
+            });
+            $($($($($('tbody').children('tr')[index]).children()).children())[0]).val(Math.round(x));
+            $($($($($('tbody').children('tr')[index]).children()).children())[1]).val(Math.round(y));
+        });
 }
