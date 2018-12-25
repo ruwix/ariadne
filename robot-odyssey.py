@@ -26,27 +26,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         file.close()
 
     def do_POST(self):
-        if self.path == "/downloadImage":
-            data_string = self.rfile.read(int(self.headers['Content-Length']))
-            data = json.loads(data_string)
-
-            svg_path = Image.open(BytesIO(
-                svg2png(bytestring=data['svgData'])))
-            field = Image.open("images/field.png")
-            svg_path = svg_path.resize(
-                (field.size[0], field.size[1]), Image.ANTIALIAS)
-
-            bytes_buffer = BytesIO()
-            field.paste(svg_path, (0, 0), svg_path)
-            field.save(bytes_buffer, "PNG")
-            bytes_buffer.seek(0)
-
-            self.send_response(200)
-            self.send_header("Content-Type", "text")
-            self.end_headers()
-
-            image_base64 = b64encode(bytes_buffer.read())
-            self.wfile.write(image_base64)
+        pass
 
 def main():
 

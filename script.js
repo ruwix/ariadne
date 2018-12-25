@@ -57,6 +57,7 @@ function drawRobot(index) {
 
     newGroup.appendTo(svg);
 }
+
 function drawRobots() {
     if (waypoints.length > 0) {
         drawRobot(0);
@@ -65,6 +66,7 @@ function drawRobots() {
         drawRobot(waypoints.length - 1);
     }
 }
+
 function update() {
     waypoints = [];
     var svg = $('#field');
@@ -202,50 +204,6 @@ function appendTable(x = 50, y = 50, heading = 0, speed = 60, comment = "") {
         "<td><input type='checkbox' checked></td>" +
         "<td><button onclick='$(this).parent().parent().remove();update()'>Delete</button></td></tr>"
     );
-}
-
-function forceDownload(url, fileName) {
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", url, true);
-    xhr.responseType = "blob";
-    xhr.onload = function () {
-        var urlCreator = window.URL || window.webkitURL;
-        var imageUrl = urlCreator.createObjectURL(this.response);
-        var tag = document.createElement('a');
-        tag.href = imageUrl;
-        tag.download = fileName;
-        document.body.appendChild(tag);
-        tag.click();
-        document.body.removeChild(tag);
-    }
-    xhr.send();
-}
-
-function downloadImage() {
-    var svg = $("#field");
-    var title = getTitle();
-    if (!title) {
-        return;
-    }
-    $.ajax({
-        type: 'POST',
-        url: '/downloadImage',
-        data: JSON.stringify({
-            svgData: svg[0].outerHTML,
-            title: title,
-        }),
-        contentType: 'application/json',
-        dataType: 'text',
-        success: function (msg) {
-            var byteCharacters = atob(msg);
-            var byteNumbers = new Array(byteCharacters.length);
-            for (var i = 0; i < byteCharacters.length; i++) {
-                byteNumbers[i] = byteCharacters.charCodeAt(i);
-            }
-            var byteArray = new Uint8Array(byteNumbers);
-            download(byteArray, title + ".png", "image/png");
-        }
-    });
 }
 
 function makePointDraggable(point) {
