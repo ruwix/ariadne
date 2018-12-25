@@ -41,6 +41,8 @@ function drawRobot(index) {
         y: y - ROBOT_HEIGHT / 2,
         "stroke-width": 3,
         class: "robot",
+        stroke: "#F78C6C",
+        fill: "transparent",
     });
     var newLine = $(document.createElementNS('http://www.w3.org/2000/svg', 'line'));
     $(newLine).attr({
@@ -107,6 +109,8 @@ function drawPoses() {
                 d: path,
                 class: "path",
                 "stroke-width": 3,
+                stroke: "#C3E88D",
+                fill: "transparent",
             });
             newPath.appendTo(svg);
         }
@@ -117,6 +121,7 @@ function drawPoses() {
             cy: waypoints[i].pose.y,
             class: "draggable waypoint",
             r: 5,
+            fill: "#FF5370",
         });
         newCircle.appendTo(svg);
     }
@@ -202,23 +207,6 @@ function appendTable(x = 50, y = 50, heading = 0, speed = 60, comment = "") {
         "<td><input type='checkbox' checked></td>" +
         "<td><button onclick='$(this).parent().parent().remove();update()'>Delete</button></td></tr>"
     );
-}
-
-function forceDownload(url, fileName) {
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", url, true);
-    xhr.responseType = "blob";
-    xhr.onload = function () {
-        var urlCreator = window.URL || window.webkitURL;
-        var imageUrl = urlCreator.createObjectURL(this.response);
-        var tag = document.createElement('a');
-        tag.href = imageUrl;
-        tag.download = fileName;
-        document.body.appendChild(tag);
-        tag.click();
-        document.body.removeChild(tag);
-    }
-    xhr.send();
 }
 
 function downloadImage() {
