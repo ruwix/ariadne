@@ -192,20 +192,7 @@ body>footer img {
     width: 4em;
 }
 
-.waypoint {
-    fill: #FF5370;
-}
 
 .waypoint:hover {
     fill: #FFCB6B;
-}
-
-.robot {
-    stroke: #F78C6C;
-    fill: transparent;
-}
-
-.path {
-    stroke: #C3E88D;
-    fill: transparent;
 }

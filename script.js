@@ -41,6 +41,8 @@ function drawRobot(index) {
         y: y - ROBOT_HEIGHT / 2,
         "stroke-width": 3,
         class: "robot",
+        stroke: "#F78C6C",
+        fill: "transparent",
     });
     var newLine = $(document.createElementNS('http://www.w3.org/2000/svg', 'line'));
     $(newLine).attr({
@@ -109,6 +111,8 @@ function drawPoses() {
                 d: path,
                 class: "path",
                 "stroke-width": 3,
+                stroke: "#C3E88D",
+                fill: "transparent",
             });
             newPath.appendTo(svg);
         }
@@ -119,6 +123,7 @@ function drawPoses() {
             cy: waypoints[i].pose.y,
             class: "draggable waypoint",
             r: 5,
+            fill: "#FF5370",
         });
         newCircle.appendTo(svg);
     }
@@ -204,6 +209,33 @@ function appendTable(x = 50, y = 50, heading = 0, speed = 60, comment = "") {
         "<td><input type='checkbox' checked></td>" +
         "<td><button onclick='$(this).parent().parent().remove();update()'>Delete</button></td></tr>"
     );
+}
+
+function downloadImage() {
+    var svg = $("#field");
+    var title = getTitle();
+    if (!title) {
+        return;
+    }
+    $.ajax({
+        type: 'POST',
+        url: '/downloadImage',
+        data: JSON.stringify({
+            svgData: svg[0].outerHTML,
+            title: title,
+        }),
+        contentType: 'application/json',
+        dataType: 'text',
+        success: function (msg) {
+            var byteCharacters = atob(msg);
+            var byteNumbers = new Array(byteCharacters.length);
+            for (var i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            var byteArray = new Uint8Array(byteNumbers);
+            download(byteArray, title + ".png", "image/png");
+        }
+    });
 }
 
 function makePointDraggable(point) {
