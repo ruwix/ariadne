@@ -137,18 +137,19 @@ pre {
 }
 
 button {
-    background-color: #89DDFF;
+    background-color: #82AAFF;
     border: none;
     padding: 7px 12px;
     border-radius: 4px;
     color: #fff;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 14px;
     transition: background-color 0.25s
 }
 
 button:hover {
-    background-color: #82AAFF;
+    background-color: #89DDFF;
+    color: #292D3E;
 }
 
 button:focus {
@@ -165,7 +166,7 @@ td>button:hover {
 
 #field {
     background-size: contain;
-    background-image: url('images/field.png');
+    background-image: url('images/field2.png');
     background-repeat: no-repeat;
 }
 

@@ -2,9 +2,11 @@ var Vector = function (x, y) {
     this.x = x || 0;
     this.y = y || 0;
 };
+
 function radians(degrees) {
     return degrees * (Math.PI / 180);
 }
+
 function interpolatePoint(t, pose0, pose1) {
     pose0 = pose0;
     pose1 = pose1;
