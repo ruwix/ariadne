@@ -166,7 +166,7 @@ td>button:hover {
 
 #field {
     background-size: contain;
-    background-image: url('images/field2.png');
+    background-image: url('images/field.png');
     background-repeat: no-repeat;
 }
 
@@ -192,7 +192,6 @@ body>footer .social {
 body>footer img {
     width: 4em;
 }
-
 
 .waypoint:hover {
     fill: #FFCB6B;

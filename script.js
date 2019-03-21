@@ -9,14 +9,22 @@ var wto;
 var odometry_interval;
 var poses = [];
 var odometry_enabled = false;
-var ROBOT_WIDTH = 35.45;
-var ROBOT_HEIGHT = 33.325;
-var FIELD_WIDTH_INCHES = 652;
-var FIELD_HEIGHT_INCHES = 324;
+var ROBOT_WIDTH = 1;
+var ROBOT_HEIGHT = 1;
+var FIELD_WIDTH_PIXELS = 815;
+var FIELD_HEIGHT_PIXELS = 405;
+var FIELD_WIDTH_METERS = 16.5608;
+var FIELD_HEIGHT_METERS = 8.2296;
+var PIXELS_PER_METER = FIELD_WIDTH_PIXELS / FIELD_WIDTH_METERS;
+var METERS_PER_PIXEL = FIELD_WIDTH_METERS / FIELD_WIDTH_PIXELS;
+
 var svg = $('#field');
 
-
 function init() {
+    svg.attr({ width: FIELD_WIDTH_PIXELS, height: FIELD_HEIGHT_PIXELS })
+    $("#poseinput").sortable({
+        stop: update
+    })
     bindInputs();
     drawRobots();
     addPoint();
@@ -27,15 +35,14 @@ function drawRobot(pose, id) {
     var newGroup = $(document.createElementNS('http://www.w3.org/2000/svg', 'g'));
     $(newGroup).attr({
         id: id,
-        transform: "rotate(" + -pose.heading + " " + pose.x + " " + pose.y + ")",
+        transform: "translate( " + pose.x * PIXELS_PER_METER + ", " + pose.y * PIXELS_PER_METER + ")" + "rotate(" + -pose.heading + " 0 0 )",
     });
     var newRect = $(document.createElementNS('http://www.w3.org/2000/svg', 'rect'));
     $(newRect).attr({
-        id: id + "rect",
-        width: ROBOT_WIDTH,
-        height: ROBOT_HEIGHT,
-        x: pose.x - ROBOT_WIDTH / 2,
-        y: pose.y - ROBOT_HEIGHT / 2,
+        width: ROBOT_WIDTH * PIXELS_PER_METER,
+        height: ROBOT_HEIGHT * PIXELS_PER_METER,
+        x: -ROBOT_WIDTH / 2 * PIXELS_PER_METER,
+        y: -ROBOT_HEIGHT / 2 * PIXELS_PER_METER,
         "stroke-width": 3,
         class: "robot",
         stroke: "#F78C6C",
@@ -43,11 +50,10 @@ function drawRobot(pose, id) {
     });
     var newLine = $(document.createElementNS('http://www.w3.org/2000/svg', 'line'));
     $(newLine).attr({
-        id: id + "line",
-        x1: pose.x,
-        y1: pose.y,
-        x2: pose.x + ROBOT_WIDTH / 2 - 1,
-        y2: pose.y,
+        x1: 0,
+        y1: 0,
+        x2: (ROBOT_WIDTH / 2) * PIXELS_PER_METER,
+        y2: 0,
         "stroke-width": 3,
         stroke: "#FF5370",
         fill: "transparent",
@@ -71,9 +77,9 @@ function update() {
     poses = [];
     var svg = $('#field');
     svg.empty();
-    $('tbody').children('tr').each(function () {
-        var x = parseInt($($($(this).children()).children()[0]).val());
-        var y = parseInt($($($(this).children()).children()[1]).val());
+    $('#poseinput').children('tr').each(function () {
+        var x = parseFloat($($($(this).children()).children()[0]).val());
+        var y = parseFloat($($($(this).children()).children()[1]).val());
         var heading = parseInt($($($(this).children()).children()[2]).val());
         var enabled = ($($($(this).children()).children()[3]).prop('checked'));
         if (enabled) {
@@ -89,12 +95,12 @@ function drawPoses() {
     var svg = $('#field');
     for (var i = 0; i < poses.length; i++) {
         if (poses.length > 1 && i != poses.length - 1) {
-            path = "M " + poses[i].x + " " + poses[i].y
+            path = "M " + poses[i].x * PIXELS_PER_METER + " " + poses[i].y * PIXELS_PER_METER;
             for (var t = 0; t < 1; t += 0.01) {
                 var point = interpolatePoint(t, poses[i], poses[i + 1]);
-                path += " L " + point.x + " " + point.y + " ";
+                path += " L " + point.x * PIXELS_PER_METER + " " + point.y * PIXELS_PER_METER + " ";
             }
-            path += " L " + poses[i + 1].x + " " + poses[i + 1].y;
+            path += " L " + poses[i + 1].x * PIXELS_PER_METER + " " + poses[i + 1].y * PIXELS_PER_METER;
 
             var newPath = $(document.createElementNS('http://www.w3.org/2000/svg', 'path'));
             $(newPath).attr({
@@ -109,8 +115,8 @@ function drawPoses() {
         var newCircle = $(document.createElementNS('http://www.w3.org/2000/svg', 'circle'));
 
         $(newCircle).attr({
-            cx: poses[i].x,
-            cy: poses[i].y,
+            cx: poses[i].x * PIXELS_PER_METER,
+            cy: poses[i].y * PIXELS_PER_METER,
             class: "draggable waypoint",
             r: 5,
             fill: "#FF5370",
@@ -126,9 +132,9 @@ function addPoint() {
         prev = poses[poses.length - 1];
     }
     else {
-        prev = new Pose(36, 36, 0);
+        prev = new Pose(0.5, 0.5, 0);
     }
-    appendTable(prev.x + 24, prev.y + 24);
+    appendTable(prev.x + 0.5, prev.y + 0.5);
     update();
     bindInputs();
 }
@@ -189,7 +195,7 @@ function importData() {
             var c = fr.result;
             var parse = readCSV(c);
             poses = []
-            $("tbody").empty();
+            $("#poseinput").empty();
             var title = fr.fileName.split('.').slice(0, -1).join('.')
             $("#title").val(title);
             parse.forEach((pose) => {
@@ -211,10 +217,10 @@ function bindInputs() {
     });
 }
 
-function appendTable(x = 50, y = 50, heading = 0) {
-    $("tbody").append("<tr>" +
-        "<td><input type='number' value='" + (x) + "'></td>" +
-        "<td><input type='number' value='" + (y) + "'></td>" +
+function appendTable(x = 0, y = 0, heading = 0) {
+    $("#poseinput").append("<tr>" +
+        "<td><input type='number' value='" + (x) + "' step='0.01'></td>" +
+        "<td><input type='number' value='" + (y) + "' step='0.01'></td>" +
         "<td><input type='number' value='" + heading + "'></td>" +
         "<td><input type='checkbox' checked></td>" +
         "<td><button onclick='$(this).parent().parent().remove();update()'>Delete</button></td></tr>"
@@ -231,14 +237,14 @@ function makePointDraggable(point) {
             var circles = Array.prototype.slice.call(document.getElementsByTagName('circle'));
             var index = circles.indexOf(event.target);
             var svg = $("#field");
-            var x = event.clientX - svg[0].getBoundingClientRect().left;
-            var y = event.clientY - svg[0].getBoundingClientRect().top;
+            var x = (event.clientX - svg[0].getBoundingClientRect().left);
+            var y = (event.clientY - svg[0].getBoundingClientRect().top);
             $(event.target).attr({
                 cx: x,
                 cy: y,
             });
-            $($($($($('tbody').children('tr')[index]).children()).children())[0]).val(Math.round(x));
-            $($($($($('tbody').children('tr')[index]).children()).children())[1]).val(Math.round(y));
+            $($($($($('#poseinput').children('tr')[index]).children()).children())[0]).val(x * METERS_PER_PIXEL);
+            $($($($($('#poseinput').children('tr')[index]).children()).children())[1]).val(y * METERS_PER_PIXEL);
         });
 }
 
@@ -277,7 +283,6 @@ function drawOdometry() {
     }
     else {
         $("#odometry").text("Disable Odometry")
-        var svg = $('#field');
         var path = "";
         var newPath = $(document.createElementNS('http://www.w3.org/2000/svg', 'path'));
         var drawn = false;
@@ -302,30 +307,20 @@ function drawOdometry() {
                     var data = JSON.parse(msg);
                     data.x;
                     data.y;
-                    var EPSILON = 0.1;
+                    var EPSILON = 0.001;
                     if (Math.abs(last_val.x - data.x) >= EPSILON || Math.abs(last_val.y - data.y) >= EPSILON || Math.abs(last_val.heading - data.heading) >= EPSILON) {
                         if (path == "") {
-                            path = "M " + data.x + " " + data.y
+                            path = "M " + data.x * PIXELS_PER_METER + " " + data.y * PIXELS_PER_METER
                         }
                         else {
-                            path += " L " + data.x + " " + data.y;
+                            path += " L " + data.x * PIXELS_PER_METER + " " + data.y * PIXELS_PER_METER;
                         }
                         if (!drawn) {
                             drawRobot(data, "odometryrobot");
                             drawn = true;
                         }
                         else {
-                            $("#odometryrobot").attr({ transform: "rotate(" + -data.heading + " " + data.x + " " + data.y + ")" });
-                            $("#odometryrobotrect").attr({
-                                "x": data.x - ROBOT_WIDTH / 2,
-                                "y": data.y - ROBOT_HEIGHT / 2,
-                            });
-                            $("#odometryrobotline").attr({
-                                "x1": data.x,
-                                "y1": data.y,
-                                "x2": data.x + ROBOT_WIDTH / 2 - 1,
-                                "y2": data.y,
-                            });
+                            $("#odometryrobot").attr({ transform: "translate( " + data.x * PIXELS_PER_METER + ", " + data.y * PIXELS_PER_METER + ")" + " rotate(" + (data.heading * 180 / Math.PI) + " 0 0 )" });
                         }
                         $("#odometrypath").attr("d", path)
                     }
@@ -341,9 +336,11 @@ function drawOdometry() {
 function invertPath() {
     for (var i = 0; i < poses.length; i++) {
         var x = poses[i].x;
-        var y = FIELD_HEIGHT_INCHES - poses[i].y;
-        $($($($($('tbody').children('tr')[i]).children()).children())[0]).val(Math.round(x));
-        $($($($($('tbody').children('tr')[i]).children()).children())[1]).val(Math.round(y));
+        var y = FIELD_HEIGHT_METERS - poses[i].y;
+        var heading = poses[i].heading;
+        $($($($($('#poseinput').children('tr')[i]).children()).children())[0]).val(x);
+        $($($($($('#poseinput').children('tr')[i]).children()).children())[1]).val(y);
+        $($($($($('#poseinput').children('tr')[i]).children()).children())[2]).val(Math.round(-heading));
     }
     update();
     bindInputs();
