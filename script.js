@@ -298,32 +298,23 @@ function toggleOdometry() {
         var path = "";
         var last_val = new Pose(0, 0, 0);
         odometry_interval = setInterval(function () {
-            $.ajax({
-                type: 'POST',
-                url: '/Ariadne',
-                data: JSON.stringify({}),
-                contentType: 'application/json',
-                dataType: 'text',
-                success: function (msg) {
-                    var data = JSON.parse(msg);
-                    data.x;
-                    data.y;
-                    var EPSILON = 0.001;
-                    if (Math.abs(last_val.x - data.x) >= EPSILON || Math.abs(last_val.y - data.y) >= EPSILON || Math.abs(last_val.heading - data.heading) >= EPSILON) {
-                        if (path == "") {
-                            path = "M " + data.x * PIXELS_PER_METER + " " + data.y * PIXELS_PER_METER
-                        }
-                        else {
-                            path += " L " + data.x * PIXELS_PER_METER + " " + data.y * PIXELS_PER_METER;
-                        }
-                        $("#robot_odometry").attr({ display: "block", transform: "translate( " + data.x * PIXELS_PER_METER + ", " + data.y * PIXELS_PER_METER + ")" + " rotate(" + (data.heading * 180 / Math.PI) + " 0 0 )" });
-                        $("#odometry").attr({ display: "block", d: path })
+            $.get('/Ariadne', function (data) {
+                var EPSILON = 0.001;
+                if (Math.abs(last_val.x - data.x) >= EPSILON || Math.abs(last_val.y - data.y) >= EPSILON || Math.abs(last_val.heading - data.heading) >= EPSILON) {
+                    if (path == "") {
+                        path = "M " + data.x * PIXELS_PER_METER + " " + data.y * PIXELS_PER_METER
                     }
-                    last_val = data;
+                    else {
+                        path += " L " + data.x * PIXELS_PER_METER + " " + data.y * PIXELS_PER_METER;
+                    }
+                    $("#robot_odometry").attr({ display: "block", transform: "translate( " + data.x * PIXELS_PER_METER + ", " + data.y * PIXELS_PER_METER + ")" + " rotate(" + (data.heading * 180 / Math.PI) + " 0 0 )" });
+                    $("#odometry").attr({ display: "block", d: path })
                 }
-            });
+                last_val = data;
+            }
+            );
 
-        }, 100);
+        }, 200);
     }
 }
 
