@@ -300,7 +300,7 @@ function toggleOdometry() {
         odometry_interval = setInterval(function () {
             $.ajax({
                 type: 'POST',
-                url: '/RobotOdyssey',
+                url: '/Ariadne',
                 data: JSON.stringify({}),
                 contentType: 'application/json',
                 dataType: 'text',

@@ -30,7 +30,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         file.close()
 
     def do_POST(self):
-        if self.path == "/RobotOdyssey":
+        if self.path == "/Ariadne":
             pose = NetworkTables.getTable(tablename).getNumberArray("Pose", [])
             if pose != []:
                 self.send_response(200)
@@ -43,7 +43,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
 
 ip = "127.0.0.1"
-tablename = "RobotOdyssey"
+tablename = "Ariadne"
 
 
 def _connectionListener(connected, info):
