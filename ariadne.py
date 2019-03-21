@@ -18,7 +18,6 @@ class RequestHandler(BaseHTTPRequestHandler):
         if self.path == "/Ariadne":
             pose = NetworkTables.getTable(tablename).getNumberArray("Pose", [])
             if pose != []:
-                print(pose)
                 self.send_response(200)
                 self.send_header("Content-Type", "appilcation/json")
                 self.end_headers()
