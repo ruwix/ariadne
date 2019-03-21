@@ -25,58 +25,45 @@ function init() {
     $("#poseinput").sortable({
         stop: update
     })
+    if (!odometry_enabled) {
+        $("#odometry").attr({ display: "none", d: "" })
+        $("#robot_odometry").attr({ display: "none" })
+    }
     bindInputs();
-    drawRobots();
+    initRobots();
     addPoint();
     addPoint();
 }
 
-function drawRobot(pose, id) {
-    var newGroup = $(document.createElementNS('http://www.w3.org/2000/svg', 'g'));
-    $(newGroup).attr({
-        id: id,
-        transform: "translate( " + pose.x * PIXELS_PER_METER + ", " + pose.y * PIXELS_PER_METER + ")" + "rotate(" + -pose.heading + " 0 0 )",
-    });
-    var newRect = $(document.createElementNS('http://www.w3.org/2000/svg', 'rect'));
-    $(newRect).attr({
-        width: ROBOT_WIDTH * PIXELS_PER_METER,
-        height: ROBOT_HEIGHT * PIXELS_PER_METER,
-        x: -ROBOT_WIDTH / 2 * PIXELS_PER_METER,
-        y: -ROBOT_HEIGHT / 2 * PIXELS_PER_METER,
-        "stroke-width": 3,
-        class: "robot",
-        stroke: "#F78C6C",
-        fill: "transparent",
-    });
-    var newLine = $(document.createElementNS('http://www.w3.org/2000/svg', 'line'));
-    $(newLine).attr({
-        x1: 0,
-        y1: 0,
-        x2: (ROBOT_WIDTH / 2) * PIXELS_PER_METER,
-        y2: 0,
-        "stroke-width": 3,
-        stroke: "#FF5370",
-        fill: "transparent",
-    });
-    newRect.appendTo(newGroup);
-    newLine.appendTo(newGroup);
-    newGroup.appendTo(svg);
-}
-
-
-function drawRobots() {
-    if (poses.length > 0) {
-        drawRobot(poses[0], "startrobot");
-    }
-    if (poses.length > 1) {
-        drawRobot(poses[poses.length - 1], "endrobot");
-    }
+function initRobots() {
+    $('.robot').each(function () {
+        var rect = $(document.createElementNS('http://www.w3.org/2000/svg', 'rect'));
+        $(rect).attr({
+            width: ROBOT_WIDTH * PIXELS_PER_METER,
+            height: ROBOT_HEIGHT * PIXELS_PER_METER,
+            x: -ROBOT_WIDTH / 2 * PIXELS_PER_METER,
+            y: -ROBOT_HEIGHT / 2 * PIXELS_PER_METER,
+            "stroke-width": 3,
+            stroke: "#F78C6C",
+            fill: "transparent",
+        });
+        var line = $(document.createElementNS('http://www.w3.org/2000/svg', 'line'));
+        $(line).attr({
+            x1: 0,
+            y1: 0,
+            x2: (ROBOT_WIDTH / 2) * PIXELS_PER_METER,
+            y2: 0,
+            "stroke-width": 3,
+            stroke: "#FF5370",
+            fill: "transparent",
+        });
+        rect.appendTo($(this));
+        line.appendTo($(this));
+    })
 }
 
 function update() {
     poses = [];
-    var svg = $('#field');
-    svg.empty();
     $('#poseinput').children('tr').each(function () {
         var x = parseFloat($($($(this).children()).children()[0]).val());
         var y = parseFloat($($($(this).children()).children()[1]).val());
@@ -86,43 +73,70 @@ function update() {
             poses.push(new Pose(x, y, heading));
         }
     });
-    drawRobots();
-    drawPoses();
+    updateRobots();
+    updatePath();
     makePointDraggable($(".draggable"));
 }
 
-function drawPoses() {
-    var svg = $('#field');
+function updateRobot(id, pose) {
+    $("#" + id).attr({
+        id: id,
+        transform: "translate( " + pose.x * PIXELS_PER_METER + ", " + pose.y * PIXELS_PER_METER + ")" + "rotate(" + -pose.heading + " 0 0 )",
+    });
+}
+
+
+function updateRobots() {
+    if (poses.length > 0) {
+        $("#robot_start").attr({
+            display: "block"
+        });
+        updateRobot("robot_start", poses[0]);
+    }
+    else {
+        $("#robot_start").attr({
+            display: "none"
+        });
+    }
+    if (poses.length > 1) {
+        $("#robot_end").attr({
+            display: "block"
+        });
+        updateRobot("robot_end", poses[poses.length - 1]);
+    }
+    else {
+        $("#robot_end").attr({
+            display: "none"
+        });
+    }
+}
+
+
+
+function updatePath() {
+    $("#points").empty()
+    var path = "M " + poses[0].x * PIXELS_PER_METER + " " + poses[0].y * PIXELS_PER_METER;
     for (var i = 0; i < poses.length; i++) {
         if (poses.length > 1 && i != poses.length - 1) {
-            path = "M " + poses[i].x * PIXELS_PER_METER + " " + poses[i].y * PIXELS_PER_METER;
             for (var t = 0; t < 1; t += 0.01) {
                 var point = interpolatePoint(t, poses[i], poses[i + 1]);
                 path += " L " + point.x * PIXELS_PER_METER + " " + point.y * PIXELS_PER_METER + " ";
             }
             path += " L " + poses[i + 1].x * PIXELS_PER_METER + " " + poses[i + 1].y * PIXELS_PER_METER;
-
-            var newPath = $(document.createElementNS('http://www.w3.org/2000/svg', 'path'));
-            $(newPath).attr({
-                d: path,
-                class: "path",
-                "stroke-width": 3,
-                stroke: "#C3E88D",
-                fill: "transparent",
-            });
-            newPath.appendTo(svg);
         }
-        var newCircle = $(document.createElementNS('http://www.w3.org/2000/svg', 'circle'));
-
-        $(newCircle).attr({
+        var circle = $(document.createElementNS('http://www.w3.org/2000/svg', 'circle'));
+        $(circle).attr({
             cx: poses[i].x * PIXELS_PER_METER,
             cy: poses[i].y * PIXELS_PER_METER,
             class: "draggable waypoint",
             r: 5,
             fill: "#FF5370",
         });
-        newCircle.appendTo(svg);
+        circle.appendTo($("#points"));
     }
+    $("#path").attr({
+        d: path,
+    });
 }
 
 
@@ -262,7 +276,6 @@ function objectToCSV(data) {
         var i = 0;
         keys.forEach(function (key) {
             if (i > 0) result += columnDelimiter;
-
             result += item[key];
             i++;
         });
@@ -272,30 +285,18 @@ function objectToCSV(data) {
     return result;
 }
 
-
-function drawOdometry() {
-    if (odometry_enabled) {
+function toggleOdometry() {
+    odometry_enabled = !odometry_enabled;
+    if (!odometry_enabled) {
         clearInterval(odometry_interval);
-        $("#odometrypath").remove()
-        $("#odometryrobot").remove()
-        odometry_enabled = false;
-        $("#odometry").text("Enable Odometry")
+        $("#odometry").attr({ display: "none", d: "" })
+        $("#robot_odometry").attr({ display: "none" })
+        $("#toggle_odometry").text("Enable Odometry")
     }
     else {
-        $("#odometry").text("Disable Odometry")
+        $("#toggle_odometry").text("Disable Odometry")
         var path = "";
-        var newPath = $(document.createElementNS('http://www.w3.org/2000/svg', 'path'));
-        var drawn = false;
         var last_val = new Pose(0, 0, 0);
-        $(newPath).attr({
-            id: "odometrypath",
-            d: path,
-            class: "path",
-            "stroke-width": 3,
-            stroke: "#C3E88D",
-            fill: "transparent",
-        });
-        newPath.appendTo(svg);
         odometry_interval = setInterval(function () {
             $.ajax({
                 type: 'POST',
@@ -315,19 +316,12 @@ function drawOdometry() {
                         else {
                             path += " L " + data.x * PIXELS_PER_METER + " " + data.y * PIXELS_PER_METER;
                         }
-                        if (!drawn) {
-                            drawRobot(data, "odometryrobot");
-                            drawn = true;
-                        }
-                        else {
-                            $("#odometryrobot").attr({ transform: "translate( " + data.x * PIXELS_PER_METER + ", " + data.y * PIXELS_PER_METER + ")" + " rotate(" + (data.heading * 180 / Math.PI) + " 0 0 )" });
-                        }
-                        $("#odometrypath").attr("d", path)
+                        $("#robot_odometry").attr({ display: "block", transform: "translate( " + data.x * PIXELS_PER_METER + ", " + data.y * PIXELS_PER_METER + ")" + " rotate(" + (data.heading * 180 / Math.PI) + " 0 0 )" });
+                        $("#odometry").attr({ display: "block", d: path })
                     }
                     last_val = data;
                 }
             });
-            odometry_enabled = true;
 
         }, 100);
     }

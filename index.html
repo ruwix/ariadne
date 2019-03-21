@@ -14,8 +14,15 @@
 
 <body onload="init()">
   <input id="title" placeholder="Title">
-  <div id="field-container" style="text-align:center;">
+  <div id="field_container" style="text-align:center;">
     <svg id="field">
+      <g id="robot_start" class="robot"></g>
+      <g id="robot_end" class="robot"></g>
+      <path id="path" stroke-width=3 stroke="#C3E88D" fill="transparent"></path>
+      <g id="robot_odometry" class="robot"></g>
+      <path id="odometry" stroke-width=3 stroke="#C3E88D" fill="transparent"></path>
+
+      <g id="points"></g>
     </svg>
   </div>
   <img id="image"></img>
@@ -23,7 +30,7 @@
     <button onclick="addPoint()">Add Point</button>
     <button onclick="exportData()">Download Path</button>
     <button onclick="importData()">Import Path</button>
-    <button id="odometry" onclick="drawOdometry()">Enable Odometry</button>
+    <button id="toggle_odometry" onclick="toggleOdometry()">Enable Odometry</button>
     <button onclick="invertPath()">Invert Path</button>
 
     <!-- <button onclick="downloadImage()">Download Image</button> -->
