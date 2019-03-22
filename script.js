@@ -6,6 +6,10 @@ class Pose {
     }
 }
 
+function round(value, decimals) {
+    return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+}
+
 var ROBOT_WIDTH = 1;
 var ROBOT_HEIGHT = 1;
 var FIELD_WIDTH_PIXELS = 815;
@@ -73,8 +77,10 @@ function update() {
         let y = parseFloat($($($(this).children()).children()[1]).val());
         let heading = parseInt($($($(this).children()).children()[2]).val());
         let enabled = ($($($(this).children()).children()[3]).prop('checked'));
-        if (enabled) {
-            poses.push(new Pose(x, y, heading));
+        if (!(isNaN(x) || isNaN(y) || isNaN(heading))) {
+            if (enabled) {
+                poses.push(new Pose(round(x, 2), round(y, 2), round(heading, 2)));
+            }
         }
     });
     updateRobots();
@@ -102,9 +108,9 @@ function addPoint() {
 
 function appendTable(x = 0, y = 0, heading = 0) {
     $("#poseInput").append("<tr>" +
-        "<td><input type='number' value='" + (x) + "' step='0.01'></td>" +
-        "<td><input type='number' value='" + (y) + "' step='0.01'></td>" +
-        "<td><input type='number' value='" + heading + "'></td>" +
+        "<td><input type='number' value='" + (round(x, 2)) + "' step='0.01'></td>" +
+        "<td><input type='number' value='" + (round(y, 2)) + "' step='0.01'></td>" +
+        "<td><input type='number' value='" + round(heading, 2) + "'></td>" +
         "<td><input type='checkbox' checked></td>" +
         "<td><button class='delete' onclick='$(this).parent().parent().remove();update()'>×</button></td></tr>"
     );
@@ -133,8 +139,8 @@ function makePointDraggable(point) {
                 cx: x,
                 cy: y,
             });
-            $($($($($('#poseInput').children('tr')[index]).children()).children())[0]).val(x * METERS_PER_PIXEL);
-            $($($($($('#poseInput').children('tr')[index]).children()).children())[1]).val(y * METERS_PER_PIXEL);
+            $($($($($('#poseInput').children('tr')[index]).children()).children())[0]).val(round(x * METERS_PER_PIXEL, 2));
+            $($($($($('#poseInput').children('tr')[index]).children()).children())[1]).val(round(y * METERS_PER_PIXEL, 2));
         });
 }
 
