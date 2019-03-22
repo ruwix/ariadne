@@ -18,10 +18,9 @@
     <svg id="field">
       <g id="robot_start" class="robot"></g>
       <g id="robot_end" class="robot"></g>
-      <path id="path" stroke-width=3 stroke="#C3E88D" fill="transparent"></path>
+      <path id="path"></path>
       <g id="robot_odometry" class="robot"></g>
-      <path id="odometry" stroke-width=3 stroke="#C3E88D" fill="transparent"></path>
-
+      <path id="odometry"></path>
       <g id="points"></g>
     </svg>
   </div>
@@ -32,10 +31,7 @@
     <button onclick="importData()">Import Path</button>
     <button id="toggle_odometry" onclick="toggleOdometry()">Enable Odometry</button>
     <button onclick="invertPath()">Invert Path</button>
-
-    <!-- <button onclick="downloadImage()">Download Image</button> -->
-    <!-- <button onclick="flipField()">Flip Field</button> -->
-    <!-- <span style="font-size: 15px; float: right;">Is reversed: <input type="checkbox" id="isReversed"></span> -->
+    <h id="state"></h>
   </div>
   <table>
     <thead>

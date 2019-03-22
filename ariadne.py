@@ -9,13 +9,16 @@ from io import BytesIO
 from shutil import copyfileobj
 from base64 import b64encode
 from networktables import NetworkTables
+from hermitespline import HermiteSpline
+import numpy as np
+from geometry import *
 
 
 class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path.endswith("favicon.ico"):
             return
-        if self.path == "/Ariadne":
+        if self.path == "/Odometry":
             pose = NetworkTables.getTable(tablename).getNumberArray("Pose", [])
             if pose != []:
                 self.send_response(200)
@@ -28,6 +31,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             else:
                 self.send_error(500, "No odometry data found.")
             return
+
         root = os.path.dirname(os.path.abspath(__file__))
         if self.path == "/":
             self.path = "/index.html"
@@ -43,7 +47,25 @@ class RequestHandler(BaseHTTPRequestHandler):
         file.close()
 
     def do_POST(self):
-        pass
+        if self.path == "/Path":
+            data_string = self.rfile.read(int(self.headers["Content-Length"]))
+            data = json.loads(data_string)
+            poses = np.array([])
+            for d in data:
+                poses = np.append(poses, Pose(d["x"], d["y"], d["heading"]))
+            spline = HermiteSpline(poses)
+            path = np.array([])
+            sample_size = 0.01
+            for i in range(0, int(spline.length / sample_size)):
+                path = np.append(path, spline.getPose(i * sample_size))
+            ret = []
+            for p in path:
+                ret.append({"x": p.x, "y": p.y, "heading": p.theta})
+            json_data = json.dumps(ret).encode(encoding="utf_8")
+            self.send_response(200)
+            self.send_header("Content-Type", "appilcation/json")
+            self.end_headers()
+            self.wfile.write(json_data)
 
 
 ip = "127.0.0.1"

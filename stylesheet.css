@@ -11,10 +11,6 @@
     border-bottom: #aaa solid 1px;
     text-align: center;
     width: 500px;
-}
-
-#title,
-#title:focus {
     outline: none;
 }
 
@@ -31,8 +27,8 @@ table {
 }
 
 thead {
-    background-color: #82AAFF;
-    color: #fff;
+    background-color: #0070FF;
+    color: #ffffff;
 }
 
 thead>tr>th {
@@ -58,76 +54,15 @@ td>input:focus {
     padding: 2px;
     border: none;
     margin: 2px 0;
-    border-bottom: #aaa solid 1px;
+    border-bottom: #AAA solid 1px;
     text-align: center;
     width: 50px;
     outline: none;
 }
 
-.comments>input,
-.comments>input:focus {
-    width: 200px;
-}
-
 .buttonContainer {
     width: 828px;
     margin: 10px auto;
-}
-
-.modal {
-    position: fixed;
-    width: 1000px;
-    min-height: 100px;
-    top: 100px;
-    left: 0;
-    right: 0;
-    margin: 0 auto;
-    opacity: 1;
-    background-color: #fff;
-    transition: opacity 0.5s;
-}
-
-.shade {
-    display: block;
-    width: 200vw;
-    height: 200vh;
-    background-color: rgba(0, 0, 0, 0.5);
-    position: fixed;
-    left: -50vw;
-    top: -50vh;
-    opacity: 1;
-    transition: opacity 0.5s;
-}
-
-.shade.hide,
-.modal.hide {
-    opacity: 0;
-}
-
-.shade.behind,
-.modal.behind {
-    z-index: -5;
-}
-
-.modal>div {
-    background-color: #34495e;
-    color: #fff;
-    text-align: center;
-    padding: 10px;
-    z-index: 10;
-}
-
-.close {
-    position: absolute;
-    display: inline-block;
-    right: 15px;
-    cursor: pointer;
-    color: #ccc;
-    transition: color 0.15s;
-}
-
-.close:hover {
-    color: #fff;
 }
 
 pre {
@@ -137,31 +72,31 @@ pre {
 }
 
 button {
-    background-color: #82AAFF;
+    background-color: #0070FF;
     border: none;
     padding: 7px 12px;
     border-radius: 4px;
-    color: #fff;
+    color: #FFFFFF;
     cursor: pointer;
     font-size: 14px;
     transition: background-color 0.25s
 }
 
 button:hover {
-    background-color: #89DDFF;
-    color: #292D3E;
+    background-color: #0062EE;
+    color: #FFFFFF;
 }
 
 button:focus {
     outline: none;
 }
 
-td>button {
-    background-color: #FF5370;
+.delete {
+    background-color: #FF1900;
 }
 
-td>button:hover {
-    background-color: #F07178;
+.delete:hover {
+    background-color: #EE1900;
 }
 
 #field {
@@ -193,6 +128,34 @@ body>footer img {
     width: 4em;
 }
 
+.robot>rect {
+    stroke-width: 3;
+    stroke: #ff8c11;
+    fill: transparent;
+}
+
+.robot>line {
+    stroke-width: 3;
+    stroke: #FF1900;
+    fill: transparent;
+}
+
 .waypoint:hover {
-    fill: #FFCB6B;
+    fill: #FBFF16;
+}
+
+.waypoint {
+    fill: #FF1900;
+}
+
+#path {
+    stroke: #2CFF2C;
+    stroke-width: 3;
+    fill: transparent;
+}
+
+#odometry {
+    stroke: #2CFF2C;
+    stroke-width: 3;
+    fill: transparent;
 }

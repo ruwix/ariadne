@@ -8,6 +8,7 @@ var Pose = function (x, y, heading) {
 var wto;
 var odometry_interval;
 var poses = [];
+let path_poses = [];
 var odometry_enabled = false;
 var ROBOT_WIDTH = 1;
 var ROBOT_HEIGHT = 1;
@@ -43,9 +44,7 @@ function initRobots() {
             height: ROBOT_HEIGHT * PIXELS_PER_METER,
             x: -ROBOT_WIDTH / 2 * PIXELS_PER_METER,
             y: -ROBOT_HEIGHT / 2 * PIXELS_PER_METER,
-            "stroke-width": 3,
-            stroke: "#F78C6C",
-            fill: "transparent",
+            class: "robot"
         });
         var line = $(document.createElementNS('http://www.w3.org/2000/svg', 'line'));
         $(line).attr({
@@ -53,9 +52,6 @@ function initRobots() {
             y1: 0,
             x2: (ROBOT_WIDTH / 2) * PIXELS_PER_METER,
             y2: 0,
-            "stroke-width": 3,
-            stroke: "#FF5370",
-            fill: "transparent",
         });
         rect.appendTo($(this));
         line.appendTo($(this));
@@ -74,8 +70,14 @@ function update() {
         }
     });
     updateRobots();
-    updatePath();
+    drawCircles();
     makePointDraggable($(".draggable"));
+    if (poses.length != 0) {
+        $.post('/Path', JSON.stringify(poses), function (data) {
+            path_poses = data;
+            updatePath();
+        });
+    }
 }
 
 function updateRobot(id, pose) {
@@ -111,19 +113,9 @@ function updateRobots() {
     }
 }
 
-
-
-function updatePath() {
+function drawCircles() {
     $("#points").empty()
-    var path = "M " + poses[0].x * PIXELS_PER_METER + " " + poses[0].y * PIXELS_PER_METER;
     for (var i = 0; i < poses.length; i++) {
-        if (poses.length > 1 && i != poses.length - 1) {
-            for (var t = 0; t < 1; t += 0.01) {
-                var point = interpolatePoint(t, poses[i], poses[i + 1]);
-                path += " L " + point.x * PIXELS_PER_METER + " " + point.y * PIXELS_PER_METER + " ";
-            }
-            path += " L " + poses[i + 1].x * PIXELS_PER_METER + " " + poses[i + 1].y * PIXELS_PER_METER;
-        }
         var circle = $(document.createElementNS('http://www.w3.org/2000/svg', 'circle'));
         $(circle).attr({
             cx: poses[i].x * PIXELS_PER_METER,
@@ -134,6 +126,20 @@ function updatePath() {
         });
         circle.appendTo($("#points"));
     }
+}
+
+function updatePath() {
+    if (poses.length == 0) {
+        return;
+    }
+    var path = "M " + poses[0].x * PIXELS_PER_METER + " " + poses[0].y * PIXELS_PER_METER;
+    if (poses.length > 1) {
+        for (let i in path_poses) {
+            path += " L " + path_poses[i].x * PIXELS_PER_METER + " " + path_poses[i].y * PIXELS_PER_METER + " ";
+        }
+    }
+    path += "L " + poses[poses.length - 1].x * PIXELS_PER_METER + " " + poses[poses.length - 1].y * PIXELS_PER_METER;
+
     $("#path").attr({
         d: path,
     });
@@ -237,7 +243,7 @@ function appendTable(x = 0, y = 0, heading = 0) {
         "<td><input type='number' value='" + (y) + "' step='0.01'></td>" +
         "<td><input type='number' value='" + heading + "'></td>" +
         "<td><input type='checkbox' checked></td>" +
-        "<td><button onclick='$(this).parent().parent().remove();update()'>Delete</button></td></tr>"
+        "<td><button class='delete' onclick='$(this).parent().parent().remove();update()'>×</button></td></tr>"
     );
 }
 
@@ -298,7 +304,12 @@ function toggleOdometry() {
         var path = "";
         var last_val = new Pose(0, 0, 0);
         odometry_interval = setInterval(function () {
-            $.get('/Ariadne', function (data) {
+            $.get('/Odometry', function (data) {
+                var x = data.x.toFixed(2);
+                var y = data.y.toFixed(2);
+                var heading = (data.heading * 180 / Math.PI).toFixed(2);
+
+                $("#state").html("(" + x + "m, " + y + "m, " + heading + "°)");
                 var EPSILON = 0.001;
                 if (Math.abs(last_val.x - data.x) >= EPSILON || Math.abs(last_val.y - data.y) >= EPSILON || Math.abs(last_val.heading - data.heading) >= EPSILON) {
                     if (path == "") {
