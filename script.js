@@ -203,9 +203,9 @@ function invertPath() {
         let x = poses[i].x;
         let y = FIELD_HEIGHT_METERS - poses[i].y;
         let heading = poses[i].heading;
-        $($($($($('#poseInput').children('tr')[i]).children()).children())[0]).val(x);
-        $($($($($('#poseInput').children('tr')[i]).children()).children())[1]).val(y);
-        $($($($($('#poseInput').children('tr')[i]).children()).children())[2]).val(Math.round(-heading));
+        $($($($($('#poseInput').children('tr')[i]).children()).children())[0]).val(round(x,2));
+        $($($($($('#poseInput').children('tr')[i]).children()).children())[1]).val(round(y,2));
+        $($($($($('#poseInput').children('tr')[i]).children()).children())[2]).val(round(-heading,0));
     }
     update();
 }

@@ -8,7 +8,7 @@
     padding: 4px;
     display: block;
     border: none;
-    border-bottom: #AAA solid 1px;
+    border-bottom: #AAAAAA solid 1px;
     text-align: center;
     width: 500px;
     outline: none;
@@ -33,7 +33,6 @@ thead>tr>th {
 tbody:before,
 tbody:after {
     content: '';
-    /* display: block; */
     height: 5px;
 }
 
@@ -82,14 +81,14 @@ button:focus {
 
 input[type=checkbox] {
     transform: scale(1.25);
-    background       : rgb(153,204,102) !important;
-
+    background: rgb(153, 204, 102) !important;
     padding: 1px;
 }
 
 .delete {
     background-color: #FF1900;
     font-size: 16px;
+
 }
 
 .delete:hover {
