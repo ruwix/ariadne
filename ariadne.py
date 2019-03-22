@@ -52,7 +52,9 @@ class RequestHandler(BaseHTTPRequestHandler):
             data = json.loads(data_string)
             poses = np.array([])
             for d in data:
-                poses = np.append(poses, Pose(d["x"], d["y"], d["heading"]))
+                poses = np.append(
+                    poses, Pose(d["x"], d["y"], -np.deg2rad(d["heading"]))
+                )
             spline = HermiteSpline(poses)
             path = np.array([])
             sample_size = 0.01

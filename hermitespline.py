@@ -134,7 +134,7 @@ class HermiteSpline:
         for i in range(0, self.length):
             scale = 2 * np.hypot(
                 self.poses[i + 1].x - self.poses[i].x,
-                self.poses[i + 1].y - self.poses[i].x,
+                self.poses[i + 1].y - self.poses[i].y,
             )
             self.dx0[i] = scale * np.cos(self.poses[i].theta)
             self.dx1[i] = scale * np.cos(self.poses[i + 1].theta)
