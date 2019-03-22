@@ -8,15 +8,10 @@
     padding: 4px;
     display: block;
     border: none;
-    border-bottom: #aaa solid 1px;
+    border-bottom: #AAA solid 1px;
     text-align: center;
     width: 500px;
     outline: none;
-}
-
-canvas {
-    margin: 0 auto;
-    display: block;
 }
 
 table {
@@ -38,7 +33,7 @@ thead>tr>th {
 tbody:before,
 tbody:after {
     content: '';
-    display: block;
+    /* display: block; */
     height: 5px;
 }
 
@@ -65,12 +60,6 @@ td>input:focus {
     margin: 10px auto;
 }
 
-pre {
-    padding: 0 20px;
-    font-size: 14px;
-    font-family: 'Source Code Pro', monospace !important;
-}
-
 button {
     background-color: #0070FF;
     border: none;
@@ -91,8 +80,16 @@ button:focus {
     outline: none;
 }
 
+input[type=checkbox] {
+    transform: scale(1.25);
+    background       : rgb(153,204,102) !important;
+
+    padding: 1px;
+}
+
 .delete {
     background-color: #FF1900;
+    font-size: 16px;
 }
 
 .delete:hover {
@@ -105,27 +102,14 @@ button:focus {
     background-repeat: no-repeat;
 }
 
-input[type=checkbox] {
-    transform: scale(1.25);
-    padding: 10px;
-}
-
 body>footer {
     font-size: 70%;
-    padding: 3em 0 1em 0em;
+    padding: 2em 0 1em 0em;
     text-align: center;
 }
 
 body>footer>address {
     margin-bottom: 0.5em;
-}
-
-body>footer .social {
-    margin-top: 2em;
-}
-
-body>footer img {
-    width: 4em;
 }
 
 .robot>rect {

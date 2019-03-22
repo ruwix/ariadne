@@ -1,15 +1,11 @@
+class Pose {
+    constructor(x = 0, y = 0, heading = 0) {
+        this.x = x;
+        this.y = y;
+        this.heading = heading;
+    }
+}
 
-var Pose = function (x, y, heading) {
-    this.x = x || 0;
-    this.y = y || 0;
-    this.heading = heading || 0;
-};
-
-var wto;
-var odometry_interval;
-var poses = [];
-let path_poses = [];
-var odometry_enabled = false;
 var ROBOT_WIDTH = 1;
 var ROBOT_HEIGHT = 1;
 var FIELD_WIDTH_PIXELS = 815;
@@ -18,19 +14,30 @@ var FIELD_WIDTH_METERS = 16.5608;
 var FIELD_HEIGHT_METERS = 8.2296;
 var PIXELS_PER_METER = FIELD_WIDTH_PIXELS / FIELD_WIDTH_METERS;
 var METERS_PER_PIXEL = FIELD_WIDTH_METERS / FIELD_WIDTH_PIXELS;
+var ODOMETRY_EPSILON = 0.001;
 
+var wto;
+var odometry_interval;
+var poses = [];
+var path_poses = [];
+var odometry_enabled = false;
 var svg = $('#field');
 
 function init() {
-    svg.attr({ width: FIELD_WIDTH_PIXELS, height: FIELD_HEIGHT_PIXELS })
-    $("#poseinput").sortable({
+    svg.attr({
+        width: FIELD_WIDTH_PIXELS,
+        height: FIELD_HEIGHT_PIXELS
+    })
+    $("#poseInput").sortable({
         stop: update
     })
     if (!odometry_enabled) {
-        $("#odometry").attr({ display: "none", d: "" })
-        $("#robot_odometry").attr({ display: "none" })
+        $("#odometry").hide().attr({
+            d: ""
+        });
+        $("#robotOdometry").hide();
     }
-    bindInputs();
+    rebind();
     initRobots();
     addPoint();
     addPoint();
@@ -38,19 +45,20 @@ function init() {
 
 function initRobots() {
     $('.robot').each(function () {
-        var rect = $(document.createElementNS('http://www.w3.org/2000/svg', 'rect'));
+        let width = ROBOT_WIDTH * PIXELS_PER_METER;
+        let height = ROBOT_WIDTH * PIXELS_PER_METER;
+        let rect = $(document.createElementNS('http://www.w3.org/2000/svg', 'rect'));
         $(rect).attr({
-            width: ROBOT_WIDTH * PIXELS_PER_METER,
-            height: ROBOT_HEIGHT * PIXELS_PER_METER,
-            x: -ROBOT_WIDTH / 2 * PIXELS_PER_METER,
-            y: -ROBOT_HEIGHT / 2 * PIXELS_PER_METER,
-            class: "robot"
+            width: width,
+            height: height,
+            x: -width / 2,
+            y: -height / 2,
         });
-        var line = $(document.createElementNS('http://www.w3.org/2000/svg', 'line'));
+        let line = $(document.createElementNS('http://www.w3.org/2000/svg', 'line'));
         $(line).attr({
             x1: 0,
             y1: 0,
-            x2: (ROBOT_WIDTH / 2) * PIXELS_PER_METER,
+            x2: width / 2,
             y2: 0,
         });
         rect.appendTo($(this));
@@ -60,11 +68,11 @@ function initRobots() {
 
 function update() {
     poses = [];
-    $('#poseinput').children('tr').each(function () {
-        var x = parseFloat($($($(this).children()).children()[0]).val());
-        var y = parseFloat($($($(this).children()).children()[1]).val());
-        var heading = parseInt($($($(this).children()).children()[2]).val());
-        var enabled = ($($($(this).children()).children()[3]).prop('checked'));
+    $('#poseInput').children('tr').each(function () {
+        let x = parseFloat($($($(this).children()).children()[0]).val());
+        let y = parseFloat($($($(this).children()).children()[1]).val());
+        let heading = parseInt($($($(this).children()).children()[2]).val());
+        let enabled = ($($($(this).children()).children()[3]).prop('checked'));
         if (enabled) {
             poses.push(new Pose(x, y, heading));
         }
@@ -78,6 +86,56 @@ function update() {
             updatePath();
         });
     }
+    rebind();
+}
+
+function addPoint() {
+    let prev;
+    if (poses.length > 0) {
+        prev = poses[poses.length - 1];
+    } else {
+        prev = new Pose(0.5, 0.5, 0);
+    }
+    appendTable(prev.x + 0.5, prev.y + 0.5);
+    update();
+}
+
+function appendTable(x = 0, y = 0, heading = 0) {
+    $("#poseInput").append("<tr>" +
+        "<td><input type='number' value='" + (x) + "' step='0.01'></td>" +
+        "<td><input type='number' value='" + (y) + "' step='0.01'></td>" +
+        "<td><input type='number' value='" + heading + "'></td>" +
+        "<td><input type='checkbox' checked></td>" +
+        "<td><button class='delete' onclick='$(this).parent().parent().remove();update()'>×</button></td></tr>"
+    );
+}
+
+function rebind() {
+    $('input').on("propertychange change click keyup input paste", function () {
+        clearTimeout(wto);
+        wto = setTimeout(function () {
+            update();
+        }, 100);
+    });
+}
+
+function makePointDraggable(point) {
+    point.draggable()
+        .on('mouseup', function (event) {
+            update();
+        })
+        .on('drag', function (event) {
+            let circles = Array.prototype.slice.call(document.getElementsByTagName('circle'));
+            let index = circles.indexOf(event.target);
+            let x = (event.clientX - svg[0].getBoundingClientRect().left);
+            let y = (event.clientY - svg[0].getBoundingClientRect().top);
+            $(event.target).attr({
+                cx: x,
+                cy: y,
+            });
+            $($($($($('#poseInput').children('tr')[index]).children()).children())[0]).val(x * METERS_PER_PIXEL);
+            $($($($($('#poseInput').children('tr')[index]).children()).children())[1]).val(y * METERS_PER_PIXEL);
+        });
 }
 
 function updateRobot(id, pose) {
@@ -87,36 +145,25 @@ function updateRobot(id, pose) {
     });
 }
 
-
 function updateRobots() {
     if (poses.length > 0) {
-        $("#robot_start").attr({
-            display: "block"
-        });
-        updateRobot("robot_start", poses[0]);
-    }
-    else {
-        $("#robot_start").attr({
-            display: "none"
-        });
+        updateRobot("robotStart", poses[0]);
+        $("#robotStart").show();
+    } else {
+        $("#robotStart").hide();
     }
     if (poses.length > 1) {
-        $("#robot_end").attr({
-            display: "block"
-        });
-        updateRobot("robot_end", poses[poses.length - 1]);
-    }
-    else {
-        $("#robot_end").attr({
-            display: "none"
-        });
+        updateRobot("robotEnd", poses[poses.length - 1]);
+        $("#robotEnd").show();
+    } else {
+        $("#robotEnd").hide();
     }
 }
 
 function drawCircles() {
     $("#points").empty()
-    for (var i = 0; i < poses.length; i++) {
-        var circle = $(document.createElementNS('http://www.w3.org/2000/svg', 'circle'));
+    for (let i in poses) {
+        let circle = $(document.createElementNS('http://www.w3.org/2000/svg', 'circle'));
         $(circle).attr({
             cx: poses[i].x * PIXELS_PER_METER,
             cy: poses[i].y * PIXELS_PER_METER,
@@ -132,7 +179,7 @@ function updatePath() {
     if (poses.length == 0) {
         return;
     }
-    var path = "M " + poses[0].x * PIXELS_PER_METER + " " + poses[0].y * PIXELS_PER_METER;
+    let path = "M " + poses[0].x * PIXELS_PER_METER + " " + poses[0].y * PIXELS_PER_METER;
     if (poses.length > 1) {
         for (let i in path_poses) {
             path += " L " + path_poses[i].x * PIXELS_PER_METER + " " + path_poses[i].y * PIXELS_PER_METER + " ";
@@ -145,199 +192,53 @@ function updatePath() {
     });
 }
 
-
-function addPoint() {
-    var prev;
-    if (poses.length > 0) {
-        prev = poses[poses.length - 1];
+function invertPath() {
+    for (let i in poses) {
+        let x = poses[i].x;
+        let y = FIELD_HEIGHT_METERS - poses[i].y;
+        let heading = poses[i].heading;
+        $($($($($('#poseInput').children('tr')[i]).children()).children())[0]).val(x);
+        $($($($($('#poseInput').children('tr')[i]).children()).children())[1]).val(y);
+        $($($($($('#poseInput').children('tr')[i]).children()).children())[2]).val(Math.round(-heading));
     }
-    else {
-        prev = new Pose(0.5, 0.5, 0);
-    }
-    appendTable(prev.x + 0.5, prev.y + 0.5);
     update();
-    bindInputs();
-}
-
-function download(content, fileName, contentType) {
-    var a = document.createElement("a");
-    var file = new Blob([content], { type: contentType });
-    a.href = URL.createObjectURL(file);
-    a.download = fileName;
-    a.click();
-}
-
-function readCSV(data) {
-    var allTextLines = data.split(/\r\n|\n/);
-    var headers = allTextLines[0].split(',');
-    var lines = [];
-
-    for (var i = 1; i < allTextLines.length; i++) {
-        var data = allTextLines[i].split(',');
-        if (data.length == headers.length) {
-
-            var tarr = [];
-            for (var j = 0; j < headers.length; j++) {
-                tarr.push(parseFloat(data[j]));
-            }
-            lines.push(tarr);
-        }
-    }
-    return lines
-}
-
-function exportData() {
-    var title = getTitle();
-    if (!title) {
-        return;
-    }
-    var csv_path = objectToCSV(poses);
-    download(csv_path, title + ".csv", 'text/plain');
-}
-
-function getTitle() {
-    var title = $('#title').val();
-    if (!title) {
-        window.alert("Please set the title");
-        return;
-    }
-    return title;
-}
-
-function importData() {
-    $('#upload').click();
-    let u = $('#upload')[0];
-    $('#upload').change(() => {
-        var file = u.files[0];
-        var fr = new FileReader();
-        fr.fileName = file.name;
-        fr.onload = function (e) {
-            var c = fr.result;
-            var parse = readCSV(c);
-            poses = []
-            $("#poseinput").empty();
-            var title = fr.fileName.split('.').slice(0, -1).join('.')
-            $("#title").val(title);
-            parse.forEach((pose) => {
-                appendTable(pose[0], pose[1], pose[2]);
-            });
-            update();
-            bindInputs();
-        }
-        fr.readAsText(file);
-    });
-}
-
-function bindInputs() {
-    $('input').on("propertychange change click keyup input paste", function () {
-        clearTimeout(wto);
-        wto = setTimeout(function () {
-            update();
-        }, 100);
-    });
-}
-
-function appendTable(x = 0, y = 0, heading = 0) {
-    $("#poseinput").append("<tr>" +
-        "<td><input type='number' value='" + (x) + "' step='0.01'></td>" +
-        "<td><input type='number' value='" + (y) + "' step='0.01'></td>" +
-        "<td><input type='number' value='" + heading + "'></td>" +
-        "<td><input type='checkbox' checked></td>" +
-        "<td><button class='delete' onclick='$(this).parent().parent().remove();update()'>×</button></td></tr>"
-    );
-}
-
-
-function makePointDraggable(point) {
-    point.draggable()
-        .on('mouseup', function (event) {
-            update();
-        })
-        .on('drag', function (event) {
-            var circles = Array.prototype.slice.call(document.getElementsByTagName('circle'));
-            var index = circles.indexOf(event.target);
-            var svg = $("#field");
-            var x = (event.clientX - svg[0].getBoundingClientRect().left);
-            var y = (event.clientY - svg[0].getBoundingClientRect().top);
-            $(event.target).attr({
-                cx: x,
-                cy: y,
-            });
-            $($($($($('#poseinput').children('tr')[index]).children()).children())[0]).val(x * METERS_PER_PIXEL);
-            $($($($($('#poseinput').children('tr')[index]).children()).children())[1]).val(y * METERS_PER_PIXEL);
-        });
-}
-
-function objectToCSV(data) {
-    var columnDelimiter = ',';
-    var lineDelimiter = '\n'
-
-    var keys = Object.keys(data[0]);
-
-    var result = '';
-    result += keys.join(columnDelimiter);
-    result += lineDelimiter;
-
-    data.forEach(function (item) {
-        var i = 0;
-        keys.forEach(function (key) {
-            if (i > 0) result += columnDelimiter;
-            result += item[key];
-            i++;
-        });
-        result += lineDelimiter;
-    });
-
-    return result;
 }
 
 function toggleOdometry() {
     odometry_enabled = !odometry_enabled;
     if (!odometry_enabled) {
         clearInterval(odometry_interval);
-        $("#odometry").attr({ display: "none", d: "" })
-        $("#robot_odometry").attr({ display: "none" })
+        $("#odometry").hide().attr({
+            d: ""
+        })
+        $("#robotOdometry").hide();
+        $("#state").hide();
         $("#toggle_odometry").text("Enable Odometry")
-    }
-    else {
+    } else {
         $("#toggle_odometry").text("Disable Odometry")
-        var path = "";
-        var last_val = new Pose(0, 0, 0);
+        let path = "";
+        let last_val = new Pose(0, 0, 0);
         odometry_interval = setInterval(function () {
             $.get('/Odometry', function (data) {
-                var x = data.x.toFixed(2);
-                var y = data.y.toFixed(2);
-                var heading = (data.heading * 180 / Math.PI).toFixed(2);
-
-                $("#state").html("(" + x + "m, " + y + "m, " + heading + "°)");
-                var EPSILON = 0.001;
-                if (Math.abs(last_val.x - data.x) >= EPSILON || Math.abs(last_val.y - data.y) >= EPSILON || Math.abs(last_val.heading - data.heading) >= EPSILON) {
+                let x = data.x.toFixed(2);
+                let y = data.y.toFixed(2);
+                let heading = (data.heading * 180 / Math.PI).toFixed(2);
+                $("#state").text("(" + x + "m, " + y + "m, " + heading + "°)").show();
+                if (Math.abs(last_val.x - data.x) >= ODOMETRY_EPSILON || Math.abs(last_val.y - data.y) >= ODOMETRY_EPSILON || Math.abs(last_val.heading - data.heading) >= ODOMETRY_EPSILON) {
                     if (path == "") {
                         path = "M " + data.x * PIXELS_PER_METER + " " + data.y * PIXELS_PER_METER
-                    }
-                    else {
+                    } else {
                         path += " L " + data.x * PIXELS_PER_METER + " " + data.y * PIXELS_PER_METER;
                     }
-                    $("#robot_odometry").attr({ display: "block", transform: "translate( " + data.x * PIXELS_PER_METER + ", " + data.y * PIXELS_PER_METER + ")" + " rotate(" + (data.heading * 180 / Math.PI) + " 0 0 )" });
-                    $("#odometry").attr({ display: "block", d: path })
+                    $("#robotOdometry").show().attr({
+                        transform: "translate( " + data.x * PIXELS_PER_METER + ", " + data.y * PIXELS_PER_METER + ")" + " rotate(" + (data.heading * 180 / Math.PI) + " 0 0 )"
+                    });
+                    $("#odometry").show().attr({
+                        d: path
+                    })
                 }
                 last_val = data;
-            }
-            );
-
+            });
         }, 200);
     }
-}
-
-function invertPath() {
-    for (var i = 0; i < poses.length; i++) {
-        var x = poses[i].x;
-        var y = FIELD_HEIGHT_METERS - poses[i].y;
-        var heading = poses[i].heading;
-        $($($($($('#poseinput').children('tr')[i]).children()).children())[0]).val(x);
-        $($($($($('#poseinput').children('tr')[i]).children()).children())[1]).val(y);
-        $($($($($('#poseinput').children('tr')[i]).children()).children())[2]).val(Math.round(-heading));
-    }
-    update();
-    bindInputs();
 }
