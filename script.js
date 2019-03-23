@@ -19,7 +19,7 @@ var FIELD_HEIGHT_METERS = 8.2296;
 var PIXELS_PER_METER = FIELD_WIDTH_PIXELS / FIELD_WIDTH_METERS;
 var METERS_PER_PIXEL = FIELD_WIDTH_METERS / FIELD_WIDTH_PIXELS;
 var ODOMETRY_EPSILON = 0.001;
-var FIELD = 'images/grid.png';
+var FIELD = 'images/field.png';
 var FIELD_FLIPPED = 'images/field-flipped.png';
 
 var wto;
