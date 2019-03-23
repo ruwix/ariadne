@@ -19,6 +19,8 @@ var FIELD_HEIGHT_METERS = 8.2296;
 var PIXELS_PER_METER = FIELD_WIDTH_PIXELS / FIELD_WIDTH_METERS;
 var METERS_PER_PIXEL = FIELD_WIDTH_METERS / FIELD_WIDTH_PIXELS;
 var ODOMETRY_EPSILON = 0.001;
+var FIELD = 'images/grid.png';
+var FIELD_FLIPPED = 'images/field-flipped.png';
 
 var wto;
 var odometry_interval;
@@ -45,6 +47,7 @@ function init() {
     initRobots();
     addPoint();
     addPoint();
+    toggleField();
 }
 
 function initRobots() {
@@ -68,6 +71,14 @@ function initRobots() {
         rect.appendTo($(this));
         line.appendTo($(this));
     })
+}
+
+function toggleField() {
+    if ($("#field").css("background-image") == "url(\"" + window.location.href + FIELD + "\")") {
+        $("#field").css("background-image", "url('" + FIELD_FLIPPED + "')")
+    } else {
+        $("#field").css("background-image", "url('" + FIELD + "')")
+    }
 }
 
 function update() {
@@ -203,9 +214,9 @@ function invertPath() {
         let x = poses[i].x;
         let y = FIELD_HEIGHT_METERS - poses[i].y;
         let heading = poses[i].heading;
-        $($($($($('#poseInput').children('tr')[i]).children()).children())[0]).val(round(x,2));
-        $($($($($('#poseInput').children('tr')[i]).children()).children())[1]).val(round(y,2));
-        $($($($($('#poseInput').children('tr')[i]).children()).children())[2]).val(round(-heading,0));
+        $($($($($('#poseInput').children('tr')[i]).children()).children())[0]).val(round(x, 2));
+        $($($($($('#poseInput').children('tr')[i]).children()).children())[1]).val(round(y, 2));
+        $($($($($('#poseInput').children('tr')[i]).children()).children())[2]).val(round(-heading, 0));
     }
     update();
 }
