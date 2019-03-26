@@ -45,8 +45,8 @@ function init() {
     }
     rebind();
     initRobots();
-    addPoint();
-    addPoint();
+    addPose();
+    addPose();
     toggleField();
 }
 
@@ -70,7 +70,7 @@ function initRobots() {
         });
         rect.appendTo($(this));
         line.appendTo($(this));
-    })
+    });
 }
 
 function toggleField() {
@@ -106,7 +106,7 @@ function update() {
     rebind();
 }
 
-function addPoint() {
+function addPose() {
     let prev;
     if (poses.length > 0) {
         prev = poses[poses.length - 1];
