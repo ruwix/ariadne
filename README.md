@@ -2,8 +2,7 @@
 A robot path planner using [cubic Hermite splines](https://en.wikipedia.org/wiki/Cubic_Hermite_spline)
 
 # Install requirements
-1. Run `[pip executable] install pillow`
-2. Run `[pip executable] install cairosvg`
+1. None
 
 # Run
 1. Run `./ariadne.py`

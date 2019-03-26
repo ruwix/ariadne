@@ -2,12 +2,8 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import mimetypes
 import json
-from cairosvg import svg2png
-from PIL import Image
 import os
-from io import BytesIO
 from shutil import copyfileobj
-from base64 import b64encode
 from networktables import NetworkTables
 from hermitespline import HermiteSpline
 import numpy as np
