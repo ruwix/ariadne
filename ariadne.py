@@ -49,7 +49,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             poses = np.array([])
             for d in data:
                 poses = np.append(
-                    poses, Pose(d["x"], d["y"], -np.deg2rad(d["heading"]))
+                    poses, Pose(d["x"], d["y"], np.deg2rad(d["heading"]))
                 )
             spline = HermiteSpline(poses)
             path = np.array([])

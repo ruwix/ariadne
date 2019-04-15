@@ -176,14 +176,14 @@ function makePointDraggable(point) {
             let tr = getTableIndex(index+1);
             console.log(index);
             $($($(tr.children()).children())[0]).val(round(x * METERS_PER_PIXEL, 2));
-            $($($(tr.children()).children())[1]).val(round(y * METERS_PER_PIXEL - FIELD_HEIGHT_METERS / 2, 2));
+            $($($(tr.children()).children())[1]).val(round(-y * METERS_PER_PIXEL + FIELD_HEIGHT_METERS / 2, 2));
         });
 }
 
 function updateRobot(id, pose) {
     $("#" + id).attr({
         id: id,
-        transform: "translate( " + pose.x * PIXELS_PER_METER + ", " + (pose.y * PIXELS_PER_METER + FIELD_HEIGHT_PIXELS / 2) + ")" + "rotate(" + -pose.heading + " 0 0 )",
+        transform: "translate( " + pose.x * PIXELS_PER_METER + ", " + (-pose.y * PIXELS_PER_METER + FIELD_HEIGHT_PIXELS / 2) + ")" + "rotate(" + -pose.heading + " 0 0 )",
     });
 }
 
@@ -208,7 +208,7 @@ function drawCircles() {
         let circle = $(document.createElementNS('http://www.w3.org/2000/svg', 'circle'));
         $(circle).attr({
             cx: poses[i].x * PIXELS_PER_METER,
-            cy: poses[i].y * PIXELS_PER_METER + FIELD_HEIGHT_PIXELS / 2,
+            cy: -poses[i].y * PIXELS_PER_METER + FIELD_HEIGHT_PIXELS / 2,
             class: "draggable waypoint",
             r: 5,
             fill: "#FF5370",
@@ -221,13 +221,13 @@ function updatePath() {
     if (poses.length == 0) {
         return;
     }
-    let path = "M " + poses[0].x * PIXELS_PER_METER + " " + (poses[0].y * PIXELS_PER_METER + FIELD_HEIGHT_PIXELS / 2);
+    let path = "M " + poses[0].x * PIXELS_PER_METER + " " + (-poses[0].y * PIXELS_PER_METER + FIELD_HEIGHT_PIXELS / 2);
     if (poses.length > 1) {
         for (let i in path_poses) {
-            path += " L " + path_poses[i].x * PIXELS_PER_METER + " " + (path_poses[i].y * PIXELS_PER_METER + FIELD_HEIGHT_PIXELS / 2) + " ";
+            path += " L " + path_poses[i].x * PIXELS_PER_METER + " " + (-path_poses[i].y * PIXELS_PER_METER + FIELD_HEIGHT_PIXELS / 2) + " ";
         }
     }
-    path += "L " + poses[poses.length - 1].x * PIXELS_PER_METER + " " + (poses[poses.length - 1].y * PIXELS_PER_METER + FIELD_HEIGHT_PIXELS / 2);
+    path += "L " + poses[poses.length - 1].x * PIXELS_PER_METER + " " + (-poses[poses.length - 1].y * PIXELS_PER_METER + FIELD_HEIGHT_PIXELS / 2);
     $("#path").attr({
         d: path,
     });
@@ -280,12 +280,12 @@ function toggleOdometry() {
                 $("#state").text("(" + x + "m, " + y + "m, " + heading + "°)").show();
                 if (Math.abs(last_val.x - data.x) >= ODOMETRY_EPSILON || Math.abs(last_val.y - data.y) >= ODOMETRY_EPSILON || Math.abs(last_val.heading - data.heading) >= ODOMETRY_EPSILON) {
                     if (path == "") {
-                        path = "M " + data.x * PIXELS_PER_METER + " " + (data.y * PIXELS_PER_METER + FIELD_HEIGHT_PIXELS / 2);
+                        path = "M " + data.x * PIXELS_PER_METER + " " + (-data.y * PIXELS_PER_METER + FIELD_HEIGHT_PIXELS / 2);
                     } else {
-                        path += " L " + data.x * PIXELS_PER_METER + " " + (data.y * PIXELS_PER_METER + FIELD_HEIGHT_PIXELS / 2);
+                        path += " L " + data.x * PIXELS_PER_METER + " " + (-data.y * PIXELS_PER_METER + FIELD_HEIGHT_PIXELS / 2);
                     }
                     $("#robotOdometry").show().attr({
-                        transform: "translate( " + data.x * PIXELS_PER_METER + ", " + (data.y * PIXELS_PER_METER + FIELD_HEIGHT_PIXELS / 2) + ")" + " rotate(" + (data.heading * 180 / Math.PI) + " 0 0 )"
+                        transform: "translate( " + data.x * PIXELS_PER_METER + ", " + (-data.y * PIXELS_PER_METER + FIELD_HEIGHT_PIXELS / 2) + ")" + " rotate(" + (data.heading * 180 / Math.PI) + " 0 0 )"
                     });
                     $("#odometry").show().attr({
                         d: path
